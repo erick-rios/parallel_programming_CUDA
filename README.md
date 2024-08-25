@@ -2,6 +2,21 @@
 
 Welcome to the official repository for the **Parallel Programming in CUDA** course. This course is designed to teach you the fundamentals and advanced concepts of parallel programming using NVIDIA's CUDA platform. Through this repository, you will find all the necessary materials, assignments, and project files to excel in the course.
 
+# CUDA Vector Addition
+
+This project demonstrates how to perform vector addition in parallel using CUDA.
+
+## Prerequisites
+
+- NVIDIA GPU with CUDA support
+- CUDA Toolkit installed
+- CMake (optional, if you're using CMake for building)
+
+## Building the Project
+
+```bash
+nvcc vector_addition.cu -o vector_addition
+
 ## Project Structure
 
 Below is the directory structure of this repository:
