@@ -21,6 +21,7 @@
  * @brief Function to initialize the vector with random values.
  * 
  * This function initializes the vector with random values between 1 and 100
+ * 
  * @param vectorToInit Pointer to the vector to be initialized.
  * @param size Size of the vector.  
  */
@@ -35,6 +36,7 @@ void initVector(float *vectorToInit, int size) {
  * @brief Function to show the vector.
  * 
  * This function prints the vector.
+ * 
  * @param vectorToPrint Pointer to the vector to be printed.
  * @param size Size of the vector.  
  */
@@ -107,12 +109,12 @@ int main(){
     gettimeofday(&end, NULL);
     
     // Print the time.
-    printf("Time: %ld\n", (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec);
+    printf("Time: %ld microseconds\n", (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec);
 
     // Print the result.
-    showVector(vectorC, size);
-    showVector(vectorA, size);
-    showVector(vectorB, size);
+    //showVector(vectorC, size);
+    //showVector(vectorA, size);
+    //showVector(vectorB, size);
 
     // Free memory on the CPU
     free(vectorA);

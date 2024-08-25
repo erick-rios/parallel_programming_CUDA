@@ -1,122 +1,108 @@
+/**
+ * @file vectorialSum.c
+ * @brief This file contains the code to perform the addition of two vectors
+ * 
+ * This program performs the addition of two vectors of size 2^20 elements each.
+ * The vectors are initialized with random values and the addition is performed
+ * on the CPU. The time taken to perform the addition is calculated and printed.
+ * 
+ * @author ERICK JESUS RIOS GONZALEZ
+ * @date 25/08/2024
+ * @version 1.0
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
 
-#define N 2048
 
-
-double cpuTime(){
-  struct timeval tp;
-  gettimeofday(&tp,NULL);
-  return ((double)tp.tv_sec + (double)tp.tv_usec*1.e-06);
-}
-
-
-void compareResults(float *res_GPU, float *res_CPU, int size){
-  double epsilon = 1.0E-8;
-  int flag = 1;
-  for(int i=0; i<size; i++){
-    if(abs(res_GPU[i]-res_CPU[i])>epsilon){
-      printf("ERROR: suma distinta\n");
-      flag = 0;
-      break;
+/**
+ * @brief Function to initialize a vector with random values
+ * 
+ * This function initializes a vector with random values between 1 and 100.
+ * 
+ * @param vector The vector to be initialized
+ * @param size The size of the vector
+ */
+void initVector(float *vector, int size) {
+    for (int i = 0; i < size; i++) {
+        vector[i] = (float)(rand() % 100 + 1);
     }
-  }
-  if(flag == 1){
-    printf("SUMA CORRECTA\n");
-  }
 }
 
-
-
-
-
-void initialData(float *A, int size){
-  srand(0);
-  for(int i=0; i<size;i++){
-    A[i] = rand() % 100 + 1;
-  }
+/**
+ * @brief Function to perform the addition of two vectors
+ * 
+ * This function performs the addition of two vectors and stores the result in a third vector.
+ * 
+ * @param vectorA The first vector
+ * @param vectorB The second vector
+ * @param vectorC The resulting vector
+ */
+void vectorialSum(float *vectorA, float *vectorB, float *vectorC, int size) {
+    for (int i = 0; i < size; i++) {
+        vectorC[i] = vectorA[i] + vectorB[i];
+    }
 }
 
-
-void sumaOnCPU(float *A, float *B, float *C, int size){
-  for(int i=0; i<size; i++){
-    C[i] = A[i] + B[i];
-  }
+/**
+ * @brief Function to print the elements of a vector
+ * 
+ * This function prints the elements of a vector.
+ * 
+ * @param vector The vector to be printed
+ * @param size The size of the vector
+ */
+void showVector(float *vector, int size) {
+    for (int i = 0; i < size; i++) {
+        printf("V[%d] = %f\n", i, vector[i]);
+    }
 }
 
-void showVector(float *A, int size){
-  for(int i=0; i<size; i++){
-    printf("V[%d] = %f\n",i,A[i]);
-  }
-}
+/**
+ * @brief Main function
+ * 
+ * This is the main function of the program.
+ * 
+ * @return 0
+ */
+int main() {
+    // Set the size of the vectors
+    int size = 1 << 20; // 2^20 = 1048576 elements
+    float *vectorA, *vectorB, *vectorC;
+    struct timeval start, end;
 
+    // Allocate memory for the vectors
+    vectorA = (float *)malloc(size * sizeof(float));
+    vectorB = (float *)malloc(size * sizeof(float));
+    vectorC = (float *)malloc(size * sizeof(float));
 
-__global__ void sumaOnGPU(float *dA, float *dB, float *dC, int size){
-  //int idx = threadIdx.x;
-  //int idx = blockIdx.x;
-  int idx = threadIdx.x + (blockIdx.x * blockDim.x);
-  dC[idx] = dA[idx]+dB[idx];
-}
+    // Initialize the vectors
+    initVector(vectorA, size);
+    initVector(vectorB, size);
 
+    // Start the timer
+    gettimeofday(&start, NULL);
 
+    // Perform vector addition
+    vectorialSum(vectorA, vectorB, vectorC, size);
 
+    // Stop the timer
+    gettimeofday(&end, NULL);
 
-int main(){
-  // Variables para medir tiempo 
-  double tic,toc, tictocS = 0, tictocP = 0;
-  // Definimos vector
-  size_t nBytes = N * sizeof(float);
-  float *h_A, *h_B, *h_C,*h_res;
-  // asignar memopria
-  h_A   = (float *)malloc(nBytes);
-  h_B   = (float *)malloc(nBytes);
-  h_C   = (float *)malloc(nBytes);
-  h_res = (float *)malloc(nBytes);
-  // Paso1. Asignamos memoria en el GPU
-  float *d_A, *d_B, *d_C;
-  cudaMalloc((float**)&d_A,nBytes);
-  cudaMalloc((float**)&d_B,nBytes);
-  cudaMalloc((float**)&d_C,nBytes);
-  // Inicializa vector
-  initialData(h_A,N);
-  initialData(h_B,N);
-  // Inicizamos con cero
-  memset(h_C,0,nBytes);
-  memset(h_res,0,nBytes);
-  // paso 2. Enviar datos
-  cudaMemcpy(d_A,h_A,nBytes,cudaMemcpyHostToDevice);
-  cudaMemcpy(d_B,h_B,nBytes,cudaMemcpyHostToDevice);
-  cudaMemcpy(d_C,h_C,nBytes,cudaMemcpyHostToDevice);
-  // Paso 3. Realizar la suma
-  dim3 bloque(1);
-  dim3 hilos(1024); 
-  tic = cpuTime();
-  sumaOnGPU<<<bloque,hilos>>>(d_A,d_B,d_C,N);
-  toc = cpuTime();
-  tictocP = toc - tic;
-  printf("Elapsed time for GPU: %lf segundos\n",tictocP);
-  // Pass 4. 
-  cudaMemcpy(h_res,d_C,nBytes,cudaMemcpyDeviceToHost);
-  // Sumamos
-  tic = cpuTime();
-  sumaOnCPU(h_A,h_B,h_C,N);
-  toc = cpuTime();
-  tictocS = toc - tic;
-  printf("Elapsed time for CPU: %lf segundos\n",tictocS);
-  // Imprime resultado
-  showVector(h_res,N);
-  compareResults(h_res,h_C,N);
-  //printf("\n\n");
-  //showVector(h_C,N);
-  // Liberar memoria
-  free(h_A);
-  free(h_B);
-  free(h_C);
-  free(h_res);
-  // Paso 5. Liberar memoria
-  cudaFree(d_A);
-  cudaFree(d_B);
-  cudaFree(d_C);
-  return 0;
+    // Calculate and print the time taken
+    long timeTaken = (end.tv_sec - start.tv_sec) * 1000000 + end.tv_usec - start.tv_usec;
+    printf("Time: %ld microseconds\n", timeTaken);
+
+    // Optional: print the vectors
+    // showVector(vectorA, size);
+    // showVector(vectorB, size);
+    // showVector(vectorC, size);
+
+    // Free allocated memory
+    free(vectorA);
+    free(vectorB);
+    free(vectorC);
+
+    return 0;
 }
