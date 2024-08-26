@@ -1,8 +1,8 @@
 /**
- * @file vectorialSubtraction.cu
- * @brief CUDA program to perfom vectorial subtraction on the GPU.
+ * @file vectorialDivision.cu
+ * @brief CUDA program to perfom vectorial division on the GPU.
  * 
- * This program performs vectorial subtraction on the GPU. The program takes two vectors as input and returns the sum of the two vectors.
+ * This program performs vectorial division on the GPU. The program takes two vectors as input and returns the sum of the two vectors.
  * Initialize the vectors with random values and print the result.
  * 
  * @author ERICK JESUS RIOS GONZALEZ
@@ -48,24 +48,24 @@ void showVector(float *vectorToPrint, int size) {
 }
 
 /**
- * @brief Function to perform vectorial subtraction on the GPU.
- * This function performs vectorial subtraction on the GPU.
+ * @brief Function to perform vectorial division on the GPU.
+ * This function performs vectorial division on the GPU.
  * @param vectorA Pointer to the first vector.
  * @param vectorB Pointer to the second vector.
  * @param vectorC Pointer to the resulting vector.
  * @param size Size of the vectors. 
  */
-__global__ void vectorialSubtraction(float *vectorA, float *vectorB, float *vectorC, int size) {
+__global__ void vectorialDivision(float *vectorA, float *vectorB, float *vectorC, int size) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     if (index < size) {
-        vectorC[index] = vectorA[index] - vectorB[index];
+        vectorC[index] = vectorA[index] / vectorB[index];
     }
 }
 
 /**
  * @brief Main function.
  * 
- * This function initializes the vectors, allocates memory on the GPU, copies the vectors to the GPU, performs the vectorial subtraction, copies the result to the CPU, and prints the result.
+ * This function initializes the vectors, allocates memory on the GPU, copies the vectors to the GPU, performs the vectorial division, copies the result to the CPU, and prints the result.
  * @return 0 if the program ends correctly.
  */
 
@@ -99,8 +99,8 @@ int main(){
     cudaMemcpy(d_vectorA, vectorA, size * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_vectorB, vectorB, size * sizeof(float), cudaMemcpyHostToDevice);
 
-    // Perform the vectorial subtraction.
-    vectorialSubtraction<<<(size + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(d_vectorA, d_vectorB, d_vectorC, size);
+    // Perform the vectorial division.
+    vectorialDivision<<<(size + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(d_vectorA, d_vectorB, d_vectorC, size);
 
     // Copy the result to the CPU.
     cudaMemcpy(vectorC, d_vectorC, size * sizeof(float), cudaMemcpyDeviceToHost);
