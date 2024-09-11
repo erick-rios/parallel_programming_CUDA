@@ -101,7 +101,7 @@ int main() {
     imshow("Imagen en escala de grises", gray_img);
 
     // Save the grayscale image
-    imwrite("output_gray.jpg", gray_img);
+    imwrite("../../images/output_gray.jpg", gray_img);
 
     // Free memory on the device
     cudaFree(d_in);
