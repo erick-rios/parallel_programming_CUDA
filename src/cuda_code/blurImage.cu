@@ -1,3 +1,18 @@
+/**
+ * @file blurImage.cu
+ * @brief This file contains the implementation of a CUDA kernel that applies a blur effect to an image.
+ * 
+ * The image is loaded from the file system and then copied to the device memory. The kernel is executed
+ * to apply the blur effect to the image and the result is copied back to the host memory to be displayed.
+ * 
+ * The blur effect is applied to each pixel of the image by averaging the pixel values of the surrounding
+ * pixels. The size of the blur effect is defined by the BLUR_SIZE constant.
+ * 
+ * The image is loaded from the file system using the OpenCV library.
+ * 
+ * @author Erick Jesús Ríos González
+ * @date 17/09/2024
+ */
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <cuda_runtime.h>
@@ -5,8 +20,16 @@
 using namespace std;
 using namespace cv;
 
-#define BLUR_SIZE 10  // Tamaño del filtro de desenfoque
+#define BLUR_SIZE 10  // Size of the blur effect
 
+/**
+ * @brief CUDA kernel that applies a blur effect to an image.
+ * 
+ * @param input Input image data.
+ * @param output Output image data.
+ * @param width Image width.
+ * @param height Image height.
+ */
 __global__ void blurKernel(unsigned char* input, unsigned char* output, int width, int height) {
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
@@ -35,11 +58,16 @@ __global__ void blurKernel(unsigned char* input, unsigned char* output, int widt
     }
 }
 
+/**
+ * @brief Main function.
+ * 
+ * @return Program exit status.
+ */
 int main() {
     Mat image = imread("../../images/5c05de636f596cb157698cde7923ce19e8473211228abb1cea24a12baaaa8074.jpg", IMREAD_COLOR);
     if (image.empty()) {
         cerr << "Error: No se pudo cargar la imagen" << endl;
-        return -1;
+        return exit(-1);
     }
 
     int width = image.cols;
