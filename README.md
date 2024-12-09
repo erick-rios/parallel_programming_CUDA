@@ -16,7 +16,7 @@ This project demonstrates how to perform vector addition in parallel using CUDA.
 
 ```bash
 nvcc vector_addition.cu -o vector_addition
-
+```
 ## Project Structure
 
 Below is the directory structure of this repository:
@@ -48,4 +48,4 @@ Below is the directory structure of this repository:
         ├── lecture1.pptx       # Introduction to CUDA
         ├── lecture2.pptx       # Memory management in CUDA
         └── ...
-``
+```
