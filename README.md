@@ -48,3 +48,4 @@ Below is the directory structure of this repository:
         ├── lecture1.pptx       # Introduction to CUDA
         ├── lecture2.pptx       # Memory management in CUDA
         └── ...
+``
